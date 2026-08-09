@@ -10,6 +10,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+
       # 1. Get code from GitHub
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -18,15 +19,30 @@ jobs:
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
 
-      # 3. Initialize Terraform
+      # 3. Check Terraform Version
+      - name: Terraform Version
+        run: terraform version
+
+      # 4. Initialize Terraform
       - name: Terraform Init
         run: terraform init
-      - name: Debug Terraform Files
 
-      # 5. Validate Terraform configuration
+      # 5. Debug Terraform Files
+      - name: Debug Terraform Files
+        run: |
+          echo "Current directory:"
+          pwd
+
+          echo "Terraform files:"
+          find . -type f -name "*.tf"
+
+          echo "Terraform Format Check:"
+          terraform fmt -check -recursive
+
+      # 6. Validate Terraform configuration
       - name: Terraform Validate
         run: terraform validate
 
-      # 6. Generate Terraform Plan
+      # 7. Generate Terraform Plan
       - name: Terraform Plan
         run: terraform plan
