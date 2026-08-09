@@ -1,0 +1,31 @@
+name: Test Pipeline
+
+on:
+  push:
+    branches:
+      - 'feature/**'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Test Pipeline
+        run: |
+          echo "=============================="
+          echo "GitHub Actions Pipeline Started"
+          echo "=============================="
+
+      - name: Check Runner
+        run: |
+          echo "Runner: $RUNNER_NAME"
+          echo "OS: $RUNNER_OS"
+          echo "Architecture: $RUNNER_ARCH"
+
+      - name: Test Commands
+        run: |
+          echo "Hello Bro!"
+          echo "Pipeline is working successfully."
+
+      - name: Finish
+        run: echo "Pipeline Completed Successfully!"
