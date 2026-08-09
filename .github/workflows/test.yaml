@@ -1,4 +1,4 @@
-name: Test Pipeline
+name: Terraform Plan
 
 on:
   push:
@@ -6,26 +6,30 @@ on:
       - 'feature/**'
 
 jobs:
-  test:
+  terraform-plan:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Test Pipeline
-        run: |
-          echo "=============================="
-          echo "GitHub Actions Pipeline Started"
-          echo "=============================="
+      # 1. Get code from GitHub
+      - name: Checkout Code
+        uses: actions/checkout@v4
 
-      - name: Check Runner
-        run: |
-          echo "Runner: $RUNNER_NAME"
-          echo "OS: $RUNNER_OS"
-          echo "Architecture: $RUNNER_ARCH"
+      # 2. Install Terraform
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
 
-      - name: Test Commands
-        run: |
-          echo "Hello Bro!"
-          echo "Pipeline is working successfully."
+      # 3. Initialize Terraform
+      - name: Terraform Init
+        run: terraform init
 
-      - name: Finish
-        run: echo "Pipeline Completed Successfully!"
+      # 4. Check Terraform formatting
+      - name: Terraform Format Check
+        run: terraform fmt -check -recursive
+
+      # 5. Validate Terraform configuration
+      - name: Terraform Validate
+        run: terraform validate
+
+      # 6. Generate Terraform Plan
+      - name: Terraform Plan
+        run: terraform plan
