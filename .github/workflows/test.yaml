@@ -1,0 +1,44 @@
+name: Terraform Plan
+
+on:
+  push:
+    branches:
+      - 'feature/**'
+
+jobs:
+  terraform-plan:
+    runs-on: ubuntu-latest
+
+    steps:
+
+      # 1. Checkout repository
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      # 2. Setup Terraform
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      # 3. Terraform Version
+      - name: Terraform Version
+        run: terraform version
+
+      # 4. Terraform Init
+      - name: Terraform Init
+        working-directory: enveroment/preprod
+        run: terraform init
+
+      # 5. Terraform Format
+      - name: Terraform Format
+        working-directory: enveroment/preprod
+        run: terraform fmt -recursive
+
+      # 6. Terraform Validate
+      - name: Terraform Validate
+        working-directory: enveroment/preprod
+        run: terraform validate
+
+      # 7. Terraform Plan
+      - name: Terraform Plan
+        working-directory: enveroment/preprod
+        run: terraform plan
