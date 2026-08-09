@@ -27,18 +27,6 @@ jobs:
       - name: Terraform Init
         run: terraform init
 
-      # 5. Debug Terraform Files
-      - name: Debug Terraform Files
-        run: |
-          echo "Current directory:"
-          pwd
-
-          echo "Terraform files:"
-          find . -type f -name "*.tf"
-
-          echo "Terraform Format Check:"
-          terraform fmt -check -recursive
-
       # 6. Validate Terraform configuration
       - name: Terraform Validate
         run: terraform validate
