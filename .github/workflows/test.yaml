@@ -22,16 +22,6 @@ jobs:
       - name: Terraform Init
         run: terraform init
        - name: Debug Terraform Files
-      - run: |
-         pwd
-         ls -la
-         find . -name "*.tf" -type f
-         terraform version
-         terraform fmt -check -recursive
-
-      # 4. Check Terraform formatting
-      - name: Terraform Format Check
-        run: terraform fmt -check -recursive
 
       # 5. Validate Terraform configuration
       - name: Terraform Validate
