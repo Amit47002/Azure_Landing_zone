@@ -1,21 +1,44 @@
-name: Self Hosted Runner Test
+name: Terraform Feature Branch CI
 
 on:
   push:
     branches:
-      - main
+      - 'feature/**'
+
+permissions:
+  contents: read
 
 jobs:
-  test:
-    runs-on: self-hosted
+  terraform:
+    name: Terraform Validate & Plan
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: Azure_Landing_zone
 
     steps:
-      - name: Checkout
+
+      # 1. Checkout repository
+      - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Test Runner
-        run: |
-          echo "Hello from self-hosted runner"
-          hostname
-          whoami
-          uname -a
+      # 2. Install Terraform
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      # 3. Terraform Init
+      - name: Terraform Init
+        run: terraform init -input=false
+
+      # 4. Terraform Format Check
+      - name: Terraform Format Check
+        run: terraform fmt -check -recursive
+
+      # 5. Terraform Validate
+      - name: Terraform Validate
+        run: terraform validate
+
+      # 6. Terraform Plan
+      - name: Terraform Plan
+        run: terraform plan -input=false -no-color
