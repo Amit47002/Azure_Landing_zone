@@ -23,8 +23,8 @@ module "vm" {
   vms        = var.vms
 }
 module "bastion" {
-  depends_on = [ module.subnet,module.pip ]
-  source = "../../module/azurerm_bastion"
+  depends_on  = [module.subnet, module.pip]
+  source      = "../../module/azurerm_bastion"
   bastion_app = var.bastion_app
 }
 
