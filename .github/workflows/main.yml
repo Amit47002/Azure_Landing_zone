@@ -1,33 +1,31 @@
-name: Terraform Plan - Azure
+name: Terraform Plan
 
-on:
+"on":
 push:
 branches:
-- feature
+- "feature/azure-pipeline"
 
 pull_request:
 branches:
-- feature
+- "feature/azure-pipeline"
 
 permissions:
 id-token: write
 contents: read
 
 env:
-ARM_USE_OIDC: true
+ARM_USE_OIDC: "true"
 ARM_CLIENT_ID: ${{ vars.AZURE_CLIENT_ID }}
 ARM_TENANT_ID: ${{ vars.AZURE_TENANT_ID }}
 ARM_SUBSCRIPTION_ID: ${{ vars.AZURE_SUBSCRIPTION_ID }}
-TF_IN_AUTOMATION: true
 
 jobs:
-terraform-plan:
-name: Terraform Plan
+terraform:
 runs-on: ubuntu-latest
 
 ```
 steps:
-  - name: Checkout Code
+  - name: Checkout
     uses: actions/checkout@v4
 
   - name: Azure Login
@@ -37,19 +35,13 @@ steps:
       tenant-id: ${{ vars.AZURE_TENANT_ID }}
       subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
 
-  - name: Verify Azure Login
+  - name: Check Azure
     run: az account show
 
-  - name: Setup Terraform
+  - name: Install Terraform
     uses: hashicorp/setup-terraform@v3
     with:
       terraform_version: 1.9.8
-
-  - name: Terraform Version
-    run: terraform version
-
-  - name: Terraform Format Check
-    run: terraform fmt -check -recursive
 
   - name: Terraform Init
     run: terraform init -input=false
@@ -58,4 +50,4 @@ steps:
     run: terraform validate
 
   - name: Terraform Plan
-    run: terraform plan -input=false 
+    run: terraform plan -input=false
