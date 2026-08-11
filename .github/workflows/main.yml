@@ -15,7 +15,7 @@ jobs:
 
     defaults:
       run:
-        working-directory: Azure_Landing_zone
+        working-directory: enveroment/preprod
 
     steps:
 
@@ -23,7 +23,7 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      # 2. Install Terraform
+      # 2. Setup Terraform
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
 
@@ -41,4 +41,4 @@ jobs:
 
       # 6. Terraform Plan
       - name: Terraform Plan
-        run: terraform plan -input=false -no-color
+        run: terraform plan -input=false
