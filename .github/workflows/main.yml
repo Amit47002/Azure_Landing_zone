@@ -1,44 +1,61 @@
-name: Terraform Feature Branch CI
+name: Terraform Plan - Azure
 
 on:
-  push:
-    branches:
-      - 'feature/**'
+push:
+branches:
+- feature
+
+pull_request:
+branches:
+- feature
 
 permissions:
-  contents: read
+id-token: write
+contents: read
+
+env:
+ARM_USE_OIDC: true
+ARM_CLIENT_ID: ${{ vars.AZURE_CLIENT_ID }}
+ARM_TENANT_ID: ${{ vars.AZURE_TENANT_ID }}
+ARM_SUBSCRIPTION_ID: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+TF_IN_AUTOMATION: true
 
 jobs:
-  terraform:
-    name: Terraform Validate & Plan
-    runs-on: ubuntu-latest
+terraform-plan:
+name: Terraform Plan
+runs-on: ubuntu-latest
 
-    defaults:
-      run:
-        working-directory: enveroment/preprod
+```
+steps:
+  - name: Checkout Code
+    uses: actions/checkout@v4
 
-    steps:
+  - name: Azure Login
+    uses: azure/login@v2
+    with:
+      client-id: ${{ vars.AZURE_CLIENT_ID }}
+      tenant-id: ${{ vars.AZURE_TENANT_ID }}
+      subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
 
-      # 1. Checkout repository
-      - name: Checkout Code
-        uses: actions/checkout@v4
+  - name: Verify Azure Login
+    run: az account show
 
-      # 2. Setup Terraform
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v3
+  - name: Setup Terraform
+    uses: hashicorp/setup-terraform@v3
+    with:
+      terraform_version: 1.9.8
 
-      # 3. Terraform Init
-      - name: Terraform Init
-        run: terraform init -input=false
+  - name: Terraform Version
+    run: terraform version
 
-      # 4. Terraform Format Check
-      - name: Terraform Format Check
-        run: terraform fmt -check -recursive
+  - name: Terraform Format Check
+    run: terraform fmt -check -recursive
 
-      # 5. Terraform Validate
-      - name: Terraform Validate
-        run: terraform validate
+  - name: Terraform Init
+    run: terraform init -input=false
 
-      # 6. Terraform Plan
-      - name: Terraform Plan
-        run: terraform plan -input=false
+  - name: Terraform Validate
+    run: terraform validate
+
+  - name: Terraform Plan
+    run: terraform plan -input=false 
