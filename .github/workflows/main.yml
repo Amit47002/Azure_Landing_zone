@@ -1,13 +1,13 @@
 name: Terraform Plan
 
-"on":
+on:
 push:
 branches:
-- "feature/azure-pipeline"
+- feature/azure-pipeline
 
 pull_request:
 branches:
-- "feature/azure-pipeline"
+- feature/azure-pipeline
 
 permissions:
 id-token: write
@@ -22,8 +22,6 @@ ARM_SUBSCRIPTION_ID: ${{ vars.AZURE_SUBSCRIPTION_ID }}
 jobs:
 terraform:
 runs-on: ubuntu-latest
-
-```
 steps:
   - name: Checkout
     uses: actions/checkout@v4
