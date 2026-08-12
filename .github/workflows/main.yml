@@ -1,51 +1,60 @@
-name: Terraform Plan
+name: Terraform Feature Branch CI
 
 on:
-push:
-branches:
-- feature/azure-pipeline
-
-pull_request:
-branches:
-- feature/azure-pipeline
+  push:
+    branches:
+      - "feature/**"
 
 permissions:
-id-token: write
-contents: read
-
-env:
-ARM_USE_OIDC: "true"
-ARM_CLIENT_ID: ${{ vars.AZURE_CLIENT_ID }}
-ARM_TENANT_ID: ${{ vars.AZURE_TENANT_ID }}
-ARM_SUBSCRIPTION_ID: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+  id-token: write
+  contents: read
 
 jobs:
-terraform:
-runs-on: ubuntu-latest
-steps:
-  - name: Checkout
-    uses: actions/checkout@v4
+  terraform-plan:
 
-  - name: Azure Login
-    uses: azure/login@v2
-    with:
-      client-id: ${{ vars.AZURE_CLIENT_ID }}
-      tenant-id: ${{ vars.AZURE_TENANT_ID }}
-      subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+    runs-on: ubuntu-latest
 
-  - name: Check Azure
-    run: az account show
+    defaults:
+      run:
+        working-directory: Azure_Landing_zone
 
-  - name: Install Terraform
-    uses: hashicorp/setup-terraform@v3
-    with:
-      terraform_version: 1.9.8
+    steps:
 
-  - name: Terraform Init
-    run: terraform init -input=false
+      # 1. Checkout repository
+      - name: Checkout Code
+        uses: actions/checkout@v4
 
-  - name: Terraform Validate
-    run: terraform validate
+      # 2. Setup Terraform
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
 
-  - name: Terraform Plan
-    run: terraform plan -input=false
+      # 3. Terraform Format Check
+      - name: Terraform Format Check
+        run: terraform fmt -check -recursive
+
+      # 4. Terraform Init
+      - name: Terraform Init
+        run: terraform init -input=false
+
+      # 5. Terraform Validate
+      - name: Terraform Validate
+        run: terraform validate
+
+      # 6. Login to Azure using OIDC
+      - name: Azure Login
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      # 7. Terraform Plan
+      - name: Terraform Plan
+        run: terraform plan -input=false -out=tfplan
+
+      # 8. Upload Terraform Plan
+      - name: Upload Terraform Plan
+        uses: actions/upload-artifact@v4
+        with:
+          name: terraform-plan
+          path: Azure_Landing_zone/tfplan
