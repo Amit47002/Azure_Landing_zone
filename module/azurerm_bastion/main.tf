@@ -1,5 +1,5 @@
-  resource "azurerm_bastion_host" "bastion" {
-    for_each = var.bastion_app
+resource "azurerm_bastion_host" "bastion" {
+  for_each            = var.bastion_app
   name                = each.value.bastion_name
   location            = each.value.location
   resource_group_name = each.value.rg_name
