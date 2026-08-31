@@ -1,73 +1,62 @@
-# ==============================
-# Birthday Notification Script
-# ==============================
-
 # CSV file path
-$CsvPath = "C:\DevOps-Insider-batch-18\08-31-2026\Azure_Landing_zone\Birth_alarting"
+$CsvPath = "C:\DevOps-Insider-batch-18\08-31-2026\Azure_Landing_zone\Birth_alarting\dob.csv"
 
 # Mailpit SMTP configuration
 $SmtpServer = "localhost"
 $SmtpPort   = 1025
-
-$From = "devops@local.test"
-$To   = "hr@local.test"
+$From       = "devops@local.test"
+$To         = "hr@local.test"
 
 # Today's date
 $Today = Get-Date
 
-Write-Host "Checking birthday for: $($Today.ToString('dd-MM-yyyy'))"
+Write-Host "Checking birthday for: $($Today.ToString('yyyy-MM-dd'))"
 
-# Read CSV
+# Import CSV
 $Employees = Import-Csv -Path $CsvPath
 
-# Check today's birthday
-$BirthdayEmployees = $Employees | Where-Object {
+foreach ($Employee in $Employees) {
 
+    # Convert DateOfBirth from CSV
     $DOB = [datetime]::ParseExact(
-        $_.DateOfBirth,
+        $Employee.DateOfBirth,
         "yyyy-MM-dd",
         $null
     )
 
-    ($DOB.Day -eq $Today.Day) -and
-    ($DOB.Month -eq $Today.Month)
-}
+    # Check month and day
+    if ($DOB.Day -eq $Today.Day -and $DOB.Month -eq $Today.Month) {
 
-# If birthday found
-if ($BirthdayEmployees) {
+        Write-Host "Birthday found: $($Employee.Name)"
 
-    foreach ($Employee in $BirthdayEmployees) {
-
-        $Subject = "🎂 Birthday Notification - $($Employee.Name)"
+        $Subject = "Birthday Alert - $($Employee.Name)"
 
         $Body = @"
-Hello Team,
+Hello HR,
 
-Today is $($Employee.Name)'s Birthday! 🎂🎉
+Today is $($Employee.Name)'s Birthday!
 
 Date of Birth: $($Employee.DateOfBirth)
 
-Please wish $($Employee.Name)
-a very Happy Birthday!
+Please wish them a Happy Birthday!
 
 Regards,
-DevOps Automation
+DevOps Team
 "@
+$SmtpServer = "smtp.gmail.com"
+$SmtpPort   = 587
 
-        # Send email through Mailpit
-        Send-MailMessage `
-            -From $From `
-            -To $To `
-            -Subject $Subject `
-            -Body $Body `
-            -SmtpServer $SmtpServer `
-            -Port $SmtpPort
+$From = "yourgmail@gmail.com"
+$To   = "hr@gmail.com"
+
+$Username = "yourgmail@gmail.com"
+$Password = "YOUR_APP_PASSWORD"
+
+$Credential = New-Object System.Management.Automation.PSCredential(
+    $Username,
+    (ConvertTo-SecureString $Password -AsPlainText -Force)
+)
 
         Write-Host "Birthday notification sent for $($Employee.Name)"
     }
-
-}
-else {
-
-    Write-Host "No birthday today."
 }
